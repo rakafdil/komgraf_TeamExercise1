@@ -1,4 +1,4 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -66,8 +66,7 @@
         const controls = new THREE.OrbitControls(camera,
             renderer.domElement);
         controls.enableDamping = true; // gerakan halus
-        controls.target.set(0, 1, 0); // titik orbit di tengah
-        ruang
+        controls.target.set(0, 1, 0); // titik orbit di tengah ruang
         controls.minDistance = 0.5; // batas zoom minimum
         controls.maxDistance = 12; // batas zoom maksimum
 
@@ -101,8 +100,7 @@
             tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
             return tex;
         }
-        // Ganti dengan file Anda (opsional); jika tidak ada, fallback akan
-        tampil
+        // Ganti dengan file Anda (opsional); jika tidak ada, fallback akan tampil
         const floorTex = safeLoad('floor.jpg', 'floor.jpg?');
         const wallTex = safeLoad('wall.jpg', 'wall.jpg?');
         const ceilingTex = safeLoad('ceiling.jpg', 'ceiling.jpg?');
