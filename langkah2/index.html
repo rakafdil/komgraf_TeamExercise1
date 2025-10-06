@@ -70,13 +70,13 @@
         controls.minDistance = 0.5; // batas zoom minimum
         controls.maxDistance = 12; // batas zoom maksimum
 
-        // ========= 3) Lights =========
+        // ========= 5) Lights =========
         const ambient = new THREE.AmbientLight(0xffffff, 0.4);
         const point = new THREE.PointLight(0xffffff, 1.0, 100);
         point.position.set(0, 2.4, 0); // lampu dekat atap, pusat ruangan
         scene.add(ambient, point);
 
-        // ========= 4) Texture loader + fallback =========
+        // ========= 6) Texture loader + fallback =========
         const loader = new THREE.TextureLoader();
         function makeFallback(label) {
             const c = document.createElement('canvas'); c.width = c.height =
@@ -109,7 +109,7 @@
         wallTex.repeat.set(1.5, 1);
         ceilingTex.repeat.set(1, 1);
 
-        // ========= 5) Materials – FrontSide (menghadap interior) =========
+        // ========= 7) Materials – FrontSide (menghadap interior) =========
         const matFloor = new THREE.MeshStandardMaterial({
             map: floorTex,
             side: THREE.FrontSide
@@ -123,7 +123,7 @@
             side: THREE.FrontSide
         });
 
-        // ========= 6) Room Geometry (dilihat dari dalam) =========
+        // ========= 8) Room Geometry (dilihat dari dalam) =========
         // Ukuran ruangan
         const W = 4; // lebar X
         const H = 3; // tinggi Y
@@ -163,23 +163,22 @@
         rightWall.position.set(W / 2, H / 2, 0);
         scene.add(rightWall);
 
-        // === 7) Render Loop (jangan lupa update controls) ===
+        // === 9) Render Loop (jangan lupa update controls) ===
         function animate() {
             requestAnimationFrame(animate);
-            controls.update(); // wajib jika
-            enableDamping = true
+            controls.update(); // wajib jika enableDamping = true
             renderer.render(scene, camera);
         }
         animate();
 
-        // === 8) Resize Responsif ===
+        // === 10) Resize Responsif ===
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        // === 9) Reset Kamera (R) ===
+        // === 11) Reset Kamera (R) ===
         window.addEventListener('keydown', (e) => {
             if (e.key === 'r' || e.key === 'R') {
                 camera.position.copy(defaultPos);
