@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Textured Room – Step 2 (OrbitControls)</title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            height: 100%;
+            overflow: hidden;
+            background: #111;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        .hint {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform:
+                translateX(-50%);
+            color: #ddd;
+            font-family: system-ui, sans-serif;
+            font-size:
+                14px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.35);
+            padding: 6px 10px;
+            border-radius:
+                8px;
+            user-select: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="hint">Drag = rotate · Scroll = zoom · Right-drag = pan · R = reset camera</div>
+    <!-- Three.js non-module (kompatibel OrbitControls global) -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.146.0/build/three.min.js"></script>
+    <!-- OrbitControls non-module untuk v0.146.0 -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.146.0/examples/js/controls/OrbitControls.js"></script>
+    <script>
+        // === 1) Scene ===
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x222222);
+
+        // === 2) Camera ===
+        const camera = new THREE.PerspectiveCamera(
+            60, window.innerWidth / window.innerHeight, 0.1, 100
+        );
+        const defaultPos = new THREE.Vector3(0, 1.5, 3); // posisi default untuk reset
+        camera.position.copy(defaultPos);
+        camera.lookAt(0, 1, 0); // fokus ke tengah ruang (tinggi 1 m)
+
+        // === 3) Renderer ===
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // === 4) OrbitControls ===
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true; // gerakan halus
+        controls.target.set(0, 1, 0); // titik orbit di tengah ruang
+        controls.minDistance = 0.5; // batas zoom minimum
+        controls.maxDistance = 12; // batas zoom maksimum
+
+
+        // === 4. Add a simple cube to see something ===
+        const geometry = new THREE.BoxGeometry(1, 1, 1);
+        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        const cube = new THREE.Mesh(geometry, material);
+        cube.position.y = 1;
+        scene.add(cube);
+
+
+        // === 5) Render Loop (jangan lupa update controls) ===
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update(); // wajib jika enableDamping = true
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // === 6) Resize Responsif ===
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // === 7) Reset Kamera (R) ===
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'r' || e.key === 'R') {
+                camera.position.copy(defaultPos);
+                controls.target.set(0, 1, 0);
+                camera.lookAt(0, 1, 0);
+                controls.update();
+                9
+            }
+        });
+    </script>
+</body>
+
+</html>
