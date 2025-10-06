@@ -67,9 +67,9 @@
     tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
     return tex;
   }
-  const floorTex   = safeLoad('floor.jpg',   'floor.jpg?');
-  const wallTex    = safeLoad('wall.jpg',    'wall.jpg?');
-  const ceilingTex = safeLoad('ceiling.jpg', 'ceiling.jpg?');
+  const floorTex   = safeLoad('textured_room/floor.jpg',   'floor.jpg?');
+  const wallTex    = safeLoad('textured_room/wall.jpg',    'wall.jpg?');
+  const ceilingTex = safeLoad('textured_room/ceiling.jpg', 'ceiling.jpg?');
 
   floorTex.repeat.set(2, 2);
   wallTex.repeat.set(1.5, 1);
