@@ -2,22 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Textured Room – Step 1</title>
+  <title>Textured Room – Step 2 (OrbitControls)</title>
   <style>
     html, body { margin: 0; height: 100%; overflow: hidden; background: #111; }
     canvas { display: block; }
+    .hint {
+      position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+      color: #ddd; font-family: system-ui, sans-serif; font-size: 14px;
+      background: rgba(0,0,0,0.35); padding: 6px 10px; border-radius: 8px;
+      user-select: none;
+    }
   </style>
 </head>
 <body>
+<div class="hint">Drag = rotate · Scroll = zoom · Right-drag = pan · R = reset camera</div>
 <script src="https://cdn.jsdelivr.net/npm/three@0.146.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.146.0/examples/js/controls/OrbitControls.js"></script>
 <script>
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x222222);
 
-  const camera = new THREE.PerspectiveCamera(
-    60, window.innerWidth / window.innerHeight, 0.1, 100
-  );
-  camera.position.set(0, 1.5, 3);
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+  const defaultPos = new THREE.Vector3(0, 1.5, 3);
+  camera.position.copy(defaultPos);
   camera.lookAt(0, 1, 0);
 
   const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -25,8 +32,15 @@
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.target.set(0, 1, 0);
+  controls.minDistance = 0.5;
+  controls.maxDistance = 12;
+
   function animate() {
     requestAnimationFrame(animate);
+    controls.update();
     renderer.render(scene, camera);
   }
   animate();
@@ -35,6 +49,15 @@
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'r' || e.key === 'R') {
+      camera.position.copy(defaultPos);
+      controls.target.set(0, 1, 0);
+      camera.lookAt(0, 1, 0);
+      controls.update();
+    }
   });
 </script>
 </body>
