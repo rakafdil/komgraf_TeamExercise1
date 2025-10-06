@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Textured Room – Step 2 (OrbitControls)</title>
+  <style>
+    html, body { margin: 0; height: 100%; overflow: hidden; background: #111; }
+    canvas { display: block; }
+    .hint {
+      position: absolute; 
+      top: 10px; 
+      left: 50%; 
+      transform: translateX(-50%);
+      color: #ddd; 
+      font-family: system-ui, sans-serif; 
+      font-size: 14px; 
+      text-align: center;
+      background: rgba(0,0,0,0.35); 
+      padding: 6px 10px; 
+      border-radius: 8px; 
+      user-select: none;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Petunjuk kontrol -->
+  <div class="hint">Drag = rotate · Scroll = zoom · Right-drag = pan · R = reset camera</div>
+
+  <!-- Three.js & OrbitControls -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.146.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.146.0/examples/js/controls/OrbitControls.js"></script>
+
+  <script>
+    // === 1) Membuat Scene ===
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x222222);
+
+    // === 2) Membuat Camera ===
+    const camera = new THREE.PerspectiveCamera(
+      60, window.innerWidth / window.innerHeight, 0.1, 100
+    );
+    const defaultPos = new THREE.Vector3(0, 1.5, 3); // posisi default
+    camera.position.copy(defaultPos);
+    camera.lookAt(0, 1, 0);
+
+    // === 3) Membuat Renderer ===
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // === 4) Menambahkan OrbitControls ===
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;  // efek gerakan halus
+    controls.target.set(0, 1, 0);   // titik orbit berada di tengah ruangan
+    controls.minDistance = 0.5;     // jarak zoom terdekat
+    controls.maxDistance = 12;      // jarak zoom terjauh
+
+    // === 5) Loop Render (wajib panggil controls.update) ===
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();            // agar damping aktif
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // === 6) Resize Responsif ===
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // === 7) Reset Kamera (tombol R) ===
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'r' || e.key === 'R') {
+        camera.position.copy(defaultPos);
+        controls.target.set(0, 1, 0);
+        camera.lookAt(0, 1, 0);
+        controls.update();
+      }
+    });
+  </script>
+</body>
+</html>

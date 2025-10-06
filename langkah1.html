@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Textured Room – Step 1</title>
+  <style>
+    /* Membuat tampilan penuh layar dan latar belakang gelap */
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      background: #111;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Three.js dari CDN (versi non-module agar mudah dijalankan langsung) -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.146.0/build/three.min.js"></script>
+
+  <script>
+    // === 1. Membuat Scene ===
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x222222); // warna abu gelap
+
+    // === 2. Membuat Camera ===
+    // Gunakan kamera perspektif (seperti mata manusia)
+    const camera = new THREE.PerspectiveCamera(
+      60,                                   // Field of View (sudut pandang vertikal)
+      window.innerWidth / window.innerHeight, // Rasio layar
+      0.1,                                  // Jarak dekat (near clipping plane)
+      100                                   // Jarak jauh (far clipping plane)
+    );
+
+    // Posisi kamera sedikit di atas dan ke depan dari titik asal
+    camera.position.set(0, 1.5, 3);
+    camera.lookAt(0, 1, 0); // Fokus ke titik tengah setinggi 1 meter
+
+    // === 3. Membuat Renderer ===
+    const renderer = new THREE.WebGLRenderer({ antialias: true }); // antialias = tepi halus
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));  // menyesuaikan DPI layar
+    renderer.setSize(window.innerWidth, window.innerHeight);       // ukuran penuh layar
+    document.body.appendChild(renderer.domElement);                // tampilkan kanvas di browser
+
+    // === 4. Loop Render ===
+    function animate() {
+      requestAnimationFrame(animate);  // memanggil ulang setiap frame (60x per detik)
+      renderer.render(scene, camera);  // menggambar scene dari sudut pandang kamera
+    }
+    animate();
+
+    // === 5. Resize Responsif ===
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();           // memperbarui proyeksi kamera
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
