@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Textured Room – Fixed Walls</title>
+  <title>Textured Room – Inside Only (Final Fixed)</title>
   <style>
     html, body {
       margin: 0;
@@ -52,7 +52,7 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    // === 4) OrbitControls ===
+    // === 4) Controls ===
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.target.set(0, 1, 0);
@@ -60,90 +60,75 @@
     controls.maxDistance = 12;
 
     // === 5) Lights ===
-    const ambient = new THREE.AmbientLight(0xffffff, 0.5);
+    const ambient = new THREE.AmbientLight(0xffffff, 0.6);
     const point = new THREE.PointLight(0xffffff, 1.2, 100);
     point.position.set(0, 2.4, 0);
     scene.add(ambient, point);
 
-    // === 6) Texture Loader + fallback ===
+    // === 6) Texture Loader ===
     const loader = new THREE.TextureLoader();
-    function makeFallback(label) {
-      const c = document.createElement('canvas'); c.width = c.height = 256;
-      const ctx = c.getContext('2d');
-      ctx.fillStyle = '#2a2a2a'; ctx.fillRect(0,0,256,256);
-      ctx.fillStyle = '#999'; ctx.font = '16px system-ui';
-      ctx.fillText(label, 20, 130);
-      return new THREE.CanvasTexture(c);
-    }
+    const floorTex   = loader.load('floor.jpg');
+    const wallTex    = loader.load('wall.jpg');
+    const ceilingTex = loader.load('ceiling.jpg');
 
-    function safeLoad(path, label) {
-      let tex = loader.load(path, () => { tex.needsUpdate = true; }, undefined, () => {
-        tex = makeFallback(label);
-      });
-      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-      tex.minFilter = THREE.LinearMipmapLinearFilter;
-      tex.magFilter = THREE.LinearFilter;
-      tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
-      return tex;
-    }
-
-    // === 7) Load textures ===
-    const floorTex   = safeLoad('floor.jpg', 'floor.jpg?');
-    const wallTex    = safeLoad('wall.jpg', 'wall.jpg?');
-    const ceilingTex = safeLoad('ceiling.jpg', 'ceiling.jpg?');
-
+    floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping;
+    wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
+    ceilingTex.wrapS = ceilingTex.wrapT = THREE.RepeatWrapping;
     floorTex.repeat.set(2, 2);
     wallTex.repeat.set(1.5, 1);
     ceilingTex.repeat.set(1, 1);
 
-    // === 8) Materials (gunakan DoubleSide agar terlihat dari dalam) ===
-    const matFloor   = new THREE.MeshStandardMaterial({ map: floorTex, side: THREE.DoubleSide });
-    const matWall    = new THREE.MeshStandardMaterial({ map: wallTex, side: THREE.DoubleSide });
-    const matCeiling = new THREE.MeshStandardMaterial({ map: ceilingTex, side: THREE.DoubleSide });
+    // === 7) Materials (semua hanya tampak dari dalam) ===
+    const matFloor   = new THREE.MeshStandardMaterial({ map: floorTex, side: THREE.FrontSide });
+    const matWall    = new THREE.MeshStandardMaterial({ map: wallTex, side: THREE.FrontSide });
+    const matCeiling = new THREE.MeshStandardMaterial({ map: ceilingTex, side: THREE.FrontSide });
 
-    // === 9) Geometry (ukuran ruangan) ===
-    const W = 4;  // lebar X
-    const H = 3;  // tinggi Y
-    const D = 6;  // panjang Z
+    // === 8) Ukuran Ruangan ===
+    const W = 4, H = 3, D = 6;
 
-    // === 10) Membuat ruangan ===
+    // === 9) Membuat Ruangan dengan orientasi dibalik ke dalam ===
 
     // Lantai
     const floor = new THREE.Mesh(new THREE.PlaneGeometry(W, D), matFloor);
     floor.rotation.x = -Math.PI / 2;
-    floor.position.set(0, 0, 0);
+    floor.scale.x = -1; // arah normal ke dalam
     scene.add(floor);
 
     // Atap
     const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(W, D), matCeiling);
     ceiling.rotation.x = Math.PI / 2;
-    ceiling.position.set(0, H, 0);
+    ceiling.position.y = H;
+    ceiling.scale.x = -1;
     scene.add(ceiling);
 
     // Dinding belakang
     const backWall = new THREE.Mesh(new THREE.PlaneGeometry(W, H), matWall);
     backWall.position.set(0, H / 2, -D / 2);
+    backWall.scale.x = -1;
     scene.add(backWall);
 
     // Dinding depan
     const frontWall = new THREE.Mesh(new THREE.PlaneGeometry(W, H), matWall);
     frontWall.rotation.y = Math.PI;
     frontWall.position.set(0, H / 2, D / 2);
+    frontWall.scale.x = -1;
     scene.add(frontWall);
 
     // Dinding kiri
     const leftWall = new THREE.Mesh(new THREE.PlaneGeometry(D, H), matWall);
-    leftWall.rotation.y = Math.PI / 2;   // menghadap ke dalam
+    leftWall.rotation.y = Math.PI / 2;
     leftWall.position.set(-W / 2, H / 2, 0);
+    leftWall.scale.x = -1;
     scene.add(leftWall);
 
     // Dinding kanan
     const rightWall = new THREE.Mesh(new THREE.PlaneGeometry(D, H), matWall);
-    rightWall.rotation.y = -Math.PI / 2; // menghadap ke dalam
+    rightWall.rotation.y = -Math.PI / 2;
     rightWall.position.set(W / 2, H / 2, 0);
+    rightWall.scale.x = -1;
     scene.add(rightWall);
 
-    // === 11) Render Loop ===
+    // === 10) Render Loop ===
     function animate() {
       requestAnimationFrame(animate);
       controls.update();
@@ -151,7 +136,7 @@
     }
     animate();
 
-    // === 12) Resize & Reset Kamera ===
+    // === 11) Resize & Reset ===
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
@@ -162,7 +147,6 @@
       if (e.key === 'r' || e.key === 'R') {
         camera.position.copy(defaultPos);
         controls.target.set(0, 1, 0);
-        camera.lookAt(0, 1, 0);
         controls.update();
       }
     });
