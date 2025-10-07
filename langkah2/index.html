@@ -93,7 +93,6 @@
             loader.load(
                 path,
                 loaded => { 
-                    tex.dispose();
                     tex.image = loaded.image; 
                     tex.needsUpdate = true; 
                 },
